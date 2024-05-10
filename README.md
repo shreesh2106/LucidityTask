@@ -8,6 +8,68 @@ This Java application dynamically builds a delivery graph based on JSON input an
 - **Every restaurant has single customer i.e. one to one mapping.**
 - **Considered only for single Delivery guy.**
 
+## Steps to run the code
+- **Clone the repo**
+- **The curl which can be used to run the application**: curl --location 'http://localhost:8080/lucidity/delivery/optimize' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "Aman" : {
+  "name" : "Aman",
+  "location": {
+  "lat":12.933,
+  "lon":77.622
+  },
+  "prepTime": 0
+  },
+  "R3" : {
+  "name" : "R3",
+  "location": {
+  "lat":12.935,
+  "lon":77.624
+  },
+  "prepTime": 1
+  },
+  "R1" : {
+  "name" : "R1",
+  "location": {
+  "lat":12.944,
+  "lon":77.640
+  },
+  "prepTime": 10
+  },
+  "R2" : {
+  "name" : "R2",
+  "location": {
+  "lat":12.935,
+  "lon":77.624
+  },
+  "prepTime": 15
+  },
+  "C1" : {
+  "name" : "C1",
+  "location": {
+  "lat":12.937,
+  "lon":77.629
+  },
+  "prepTime": 0
+  },
+  "C1=2" : {
+  "name" : "C2",
+  "location": {
+  "lat":12.940,
+  "lon":77.634
+  },
+  "prepTime": 0
+  },
+  "C3" : {
+  "name" : "C3",
+  "location": {
+  "lat":8.537,
+  "lon":8.629
+  },
+  "prepTime": 0
+  }
+  }'
 ## Features
 - **Dynamic Node Parsing**: Parses nodes from a JSON, allowing easy modification of node characteristics and relationships.
 - **Automatic Edge Creation**: Automatically creates edges between all nodes with calculated travel times based on geographic distances.
