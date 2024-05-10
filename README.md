@@ -125,7 +125,10 @@ This project implements a dynamic programming solution to the Traveling Salesman
 
 4. **Result Extraction**
   - The minimal travel cost and path are extracted from the DP table, ensuring the constraints are met.
-  - 
+
+## Algorithm/Performance
+To enhance the Delivery Routing System using Dynamic Programming (DP), we can employ the Held-Karp algorithm, which is a well-known approach for solving the Traveling Salesman Problem (TSP). The Held-Karp algorithm uses dynamic programming to find the shortest path that visits each vertex once and returns to the origin vertex, achieving an optimal solution. This approach is considerably more efficient than the factorial time complexity of generating all permutations when
+even n is small, though it remains exponential and thus best suited for smaller datasets (typically up to 20-25 nodes).
 ## Example Usage
 The solution can be utilized in scenarios such as logistics planning where deliveries must follow pickups, and routes must be optimized for cost and compliance with operational rules.
 ## Conclusion
