@@ -3,7 +3,9 @@ package com.lucidity.task.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,50 +13,32 @@ import java.util.Map;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Graph {
-    Map<String, Node> nodes;
+    static final double AMAN_SPEED = 20.0;
+    List<Node> nodes = new ArrayList<>();
+    double[][] distanceMatrix;
+    Map<String, Integer> nameToIndex = new HashMap<>();
 
-    public Graph() {
-        this.nodes = new HashMap<>();
+    public void addNode(final Node node) {
+        nodes.add(node);
+        nameToIndex.put(node.name, nodes.size() - 1);
     }
 
-    public void addNode(Node node) {
-        nodes.put(node.name, node);
-    }
+    public void setupDistanceMatrix() {
+        final int n = nodes.size();
+        distanceMatrix = new double[n][n];
 
-    void addEdge(String fromNode, String toNode) {
-        Node from = nodes.get(fromNode);
-        Node to = nodes.get(toNode);
-        double distance = from.location.distanceTo(to.location);
-        double adjustedTime = travelTime(distance, 20) + to.prepTime;
-        from.addEdge(to, adjustedTime);
-    }
-
-    public void addAllEdges(Map<String, Node> nodes) {
-        for (Node from : nodes.values()) {
-            for (Node to : nodes.values()) {
-                if (!from.name.equals(to.name)) {
-                    double distance = from.location.distanceTo(to.location);
-                    double travelTime = travelTime(distance, 20);
-                    double adjustedTime = travelTime + to.prepTime;
-                    from.addEdge(to, adjustedTime);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    distanceMatrix[i][j] = 0;
+                } else {
+                    final double distance = nodes.get(i).getLocation().distanceTo(nodes.get(j).getLocation());
+                    final double speed = (nodes.get(i).name.equals("Aman") || nodes.get(j).name.equals("Aman")) ? AMAN_SPEED : 20; // Use Aman's speed if either node is Aman
+                    distanceMatrix[i][j] = (distance / speed) * 60 + nodes.get(j).prepTime;  // Convert hours to minutes
                 }
             }
         }
-    }
-
-    public double calculateCost(List<String> path) {
-        double totalCost = 0;
-        for (int i = 0; i < path.size() - 1; i++) {
-            Node fromNode = nodes.get(path.get(i));
-            Node toNode = nodes.get(path.get(i + 1));
-            double distance = fromNode.location.distanceTo(toNode.location);
-            totalCost += travelTime(distance, 20) + toNode.prepTime;
-        }
-        return totalCost;
-    }
-
-    double travelTime(double distance, double speed) {
-        return distance / speed * 60;  // Convert hours to minutes
     }
 }

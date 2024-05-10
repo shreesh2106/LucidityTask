@@ -1,15 +1,16 @@
 # Delivery Routing System
 
 ## Project Overview
-This Java application dynamically builds a delivery graph based on JSON input and calculates the optimal route using a combinatorial approach. It supports flexible input, automatically adapting to changes in the number of nodes and their specific relationships.
+This project implements a dynamic programming solution to the Traveling Salesman Problem (TSP), tailored to handle specific constraints where certain nodes (pickups) must be visited before others (deliveries). It's designed to find the most cost-effective route that visits all given locations exactly once and returns to the starting point, while respecting the order constraints between paired nodes.
 
 ## Assumptions
 - **Constant speed.** 
-- **Every restaurant has single customer i.e. one to one mapping.**
+- **Every restaurant Ri and customer Ci should be considered as one order rather than individuals.**
 - **Considered only for single Delivery guy.**
 
 ## Steps to run the code
-- **Clone the repo**
+- **Clone the repository using git clone.**
+- **The main class is LucidityProjectApplication.**
 - **The curl which can be used to run the application**: curl --location 'http://localhost:8080/lucidity/delivery/optimize' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -85,44 +86,47 @@ This Java application dynamically builds a delivery graph based on JSON input an
 2. Include the JSON.org library in your project to handle JSON parsing.
 3. Compile and run the `DeliveryRoutingSystem.java` file.
 
-## Detailed Code Explanation
-### Classes and Their Roles
+### Dynamic Programming Approach
 
-#### Location Class
-- Holds latitude and longitude of a node.
-- Utilized by the `Node` class to store geographical data.
+#### Key Components
 
-#### Node Class
-- Represents a graph node, which could be a pickup, delivery, or the starting point ("Aman").
-- Attributes include a `name`, a `Location` object, `prepTime`, and a list of `Edge` objects.
-- `addEdge` method: Adds an outgoing edge to this node, linking it to another node with specified travel weight.
+1. **Graph Representation**
+  - **Nodes**: Represents locations including a starting point, several pickup points, and corresponding delivery points.
+  - **Edges**: Represents possible routes between each pair of nodes with associated travel costs that include travel time and any preparation time at the destination node.
 
-#### Edge Class
-- Represents a directed connection between two nodes.
-- Stores the weight of the edge (travel time) and a reference to the destination node.
+2. **State Representation**
+  - A state in the dynamic programming table is represented by a bitmask where each bit indicates whether a corresponding node has been visited (`1`) or not (`0`).
 
-#### Graph Class
-- Contains all nodes and manages connections (edges) between them.
-- `addNode`: Adds a node to the graph.
-- `addAllEdges`: Automatically creates edges between all pairs of nodes using the haversine formula for distance and calculates travel time.
-- `calculateCost`: Computes the total cost (time) of traveling a specified path through the graph.
+3. **Transition Function**
+  - The transition between states is governed by the feasibility of moving from one node to another, ensuring that no delivery node is visited before its corresponding pickup node.
 
-#### haversineDistance (method)
-- Calculates the great-circle distance between two points on a sphere given their longitudes and latitudes.
-- Essential for calculating the real-world distance between two nodes.
+4. **Cost Calculation**
+  - The cost associated with each transition is calculated based on the distance between nodes, adjusted by the travel speed and any additional time spent at the nodes.
 
-#### travelTime (method)
-- Converts a distance (in kilometers) into travel time based on a preset speed (20 km/h here), converting the result into minutes.
+5. **Initialization**
+  - The dynamic programming table (`dp`) is initialized such that the cost of starting from the initial node is zero and all other costs are set to infinity.
 
-### Main Method and Program Flow
+6. **Table Filling**
+  - The DP table is populated by considering all possible states and making transitions only if they are permissible under the problem constraints (e.g., pickup before delivery).
 
-- **JSON Parsing**: Nodes are dynamically created from a JSON string, including their properties such as name, coordinates, and preparation time.
-- **Graph Construction**: All nodes are added to a graph, and edges between them are created based on calculated distances.
-- **Permutation Generation and Validation**: Generates all possible routes from the node permutations, checks each for validity ensuring deliveries follow pickups.
-- **Optimal Path Calculation**: Finds and outputs the path with the minimal total cost.
+7. **Path Reconstruction**
+  - After the table is filled, the optimal path is reconstructed by backtracking from the final state to the starting state using a parent tracking array that records the optimal preceding node for each state.
 
+### Code Structure
+
+1. **Graph Setup**
+  - Nodes and edges are defined with distances calculated using the Haversine formula, which estimates the shortest distance over the earth's surface.
+
+2. **Dynamic Programming Table Definition**
+  - A 2D array `dp` where `dp[mask][i]` holds the minimum cost to reach state `mask` ending at node `i`.
+
+3. **Recursive State Transitions**
+  - For each possible state and ending node, the algorithm explores all feasible transitions from other nodes and updates the DP table accordingly.
+
+4. **Result Extraction**
+  - The minimal travel cost and path are extracted from the DP table, ensuring the constraints are met.
+  - 
 ## Example Usage
-The program is executed with a predefined JSON string that includes node data. It outputs the optimal path based on the constraints that deliveries must follow pickups.
-
+The solution can be utilized in scenarios such as logistics planning where deliveries must follow pickups, and routes must be optimized for cost and compliance with operational rules.
 ## Conclusion
-This system is ideal for scenarios where route optimization is needed based on dynamic input. It efficiently handles varying numbers of nodes and their relationships, making it suitable for delivery services and logistics planning.
+This implementation not only solves the TSP under standard conditions but also adapts to scenarios with additional logical constraints, making it a robust tool for route optimization in complex logistical operations.
